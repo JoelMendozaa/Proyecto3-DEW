@@ -43,3 +43,39 @@ function asientos(avion) {
     }
     document.write(`</table>`);
 }
+
+function eleccionAsientos(avion, cantidadTicket) {
+    var asientosSeleccionados = []; // Array para almacenar los asientos seleccionados
+
+    for (let i = 0; i < cantidadTicket; i++) {
+        let asientoDisponible = false;
+        while (!asientoDisponible) {
+            var asientoFila = parseInt(prompt(`Billete ${i + 1}: ¿En qué fila desea sentarse?`));
+            var asientoColumna = parseInt(prompt(`Billete ${i + 1}: ¿En qué columna desea sentarse?`));
+
+            // Construimos el ID del asiento en función de la fila y la columna
+            var asientoId = `asiento-${asientoFila}-${asientoColumna}`;
+            let asiento = avion.color.find(asiento => asiento.id === asientoId);
+
+            if (asiento) {
+                if (asiento.color === 'green') {
+                    // Si el asiento está en verde, lo ocupamos y cambiamos su color a rojo
+                    asiento.color = 'red';
+                    document.getElementById(asientoId).style.backgroundColor = 'red';
+                    alert(`Billete ${i + 1}: Has seleccionado el asiento en la fila ${asientoFila} y la columna ${asientoColumna}`);
+                    console.log(`Billete ${i + 1}: Has seleccionado el asiento en la fila ${asientoFila} y la columna ${asientoColumna}`);
+                    asientoDisponible = true; // Salimos del bucle porque el asiento ha sido seleccionado correctamente
+                    asientosSeleccionados.push(asientoId); // Agregar asiento seleccionado al array
+                } else {
+                    // Si el asiento está ocupado (rojo), lanzamos una alerta
+                    alert("El asiento seleccionado ya está ocupado. Por favor, elija otro asiento.");
+                }
+            } else {
+                alert("El asiento seleccionado no existe. Por favor, elija un asiento válido.");
+            }
+        }
+    }
+
+    // Mostrar todos los asientos seleccionados
+    alert(`Has seleccionado los siguientes asientos: ${asientosSeleccionados.join(', ')}`);
+}
