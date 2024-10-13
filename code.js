@@ -4,12 +4,33 @@ function Avion(name, rows, column, price) { // Objeto avión
     this.column = column;
     this.priceBase = price;
     this.color = [];           // Array para almacenar el color de los asientos
+    this.asientosOcupados = [];
 }
 
 // Se crean los objetos con sus respectivos nombres de las aerolíneas y constructor.
 const binter = new Avion("Binter", 20, 6, 120);
 const iberiaExpress = new Avion("Iberia", 25, 6, 100);
 const vueling = new Avion("Vueling", 15, 4, 140);
+
+
+// Local storage para los aviones
+function storageLocal(){
+    localStorage.setItem("Binter", "Binter");
+    localStorage.setItem("Iberia", "Iberia Express");
+    localStorage.setItem("Vueling", "Vueling");
+}
+
+function cargarAsientosOcupados(avion) {
+    const asientosGuardados = sessionStorage.getItem(avion.name);
+    if (asientosGuardados) {
+        avion.asientosOcupados = asientosGuardados.split(',');
+    }
+}
+
+function storageSession(avion, asientoId) {
+    avion.asientosOcupados.push(asientoId); // Añadir el asiento a la lista de ocupados
+    sessionStorage.setItem(avion.name, avion.asientosOcupados.join(',')); // Guardar en sessionStorage
+}
 
 function asientos(avion) {
     document.write(`<table>`);
@@ -32,14 +53,26 @@ function asientos(avion) {
 
             document.write(`
                 <td>
-                    <div id="${asientoId}" class="seat" style="background-color: ${colorAsiento};">  
+                    <button id="${asientoId}" class="seat" style="background-color: ${colorAsiento};">  
                         ${fila + 1} - ${columna + 1}
-                    </div> 
+                    </button> 
                 </td>
             `);
+
+            document.getElementById(asientoId).addEventListener('click', function() {
+                if (this.style.backgroundColor === 'green') {
+                    this.style.backgroundColor = 'red'; // Cambia a rojo cuando se selecciona
+                    guardarAsientoEnSessionStorage(avion, asientoId); // Guardar asiento en sessionStorage
+                    alert(`Has seleccionado el asiento ${asientoId}`);
+                } else {
+                    alert("Este asiento ya está ocupado");
+                }
+            });
             console.log("Columnas " + (columna + 1));
         }
         document.write(`</tr>`);
     }
     document.write(`</table>`);
 }
+
+guardarAvionesEnLocalStorage();
