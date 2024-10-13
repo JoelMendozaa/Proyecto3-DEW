@@ -23,13 +23,13 @@ function storageLocal(){
 function cargarAsientosOcupados(avion) {
     const asientosGuardados = sessionStorage.getItem(avion.name);
     if (asientosGuardados) {
-        avion.asientosOcupados = asientosGuardados.split(',');
+        avion.asientosOcupados = asientosGuardados.split(',');      // Pasamos una cadena de texto a array
     }
 }
 
 function storageSession(avion, asientoId) {
     avion.asientosOcupados.push(asientoId); // Añadir el asiento a la lista de ocupados
-    sessionStorage.setItem(avion.name, avion.asientosOcupados.join(',')); // Guardar en sessionStorage
+    sessionStorage.setItem(avion.name, avion.asientosOcupados.join(',')); // Guardar en sessionStorage y transformamos el array en cadena de texto
 }
 
 function asientos(avion) {
