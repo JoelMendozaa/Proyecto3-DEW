@@ -1,77 +1,109 @@
-function Avion(name, rows, column, price) { // Objeto avión
+function Avion(name, rows, columns, priceBase) {
     this.name = name;
-    this.rows = rows;           // Constructor
-    this.column = column;
-    this.priceBase = price;
-    this.color = [];           // Array para almacenar el color de los asientos
+    this.rows = rows;
+    this.columns = columns;
+    this.priceBase = priceBase;
     this.asientosOcupados = [];
 }
 
-// Se crean los objetos con sus respectivos nombres de las aerolíneas y constructor.
+// Aviones definidos
 const binter = new Avion("Binter", 20, 6, 120);
 const iberiaExpress = new Avion("Iberia", 25, 6, 100);
 const vueling = new Avion("Vueling", 15, 4, 140);
 
-
-// Local storage para los aviones
-function storageLocal(){
-    localStorage.setItem("Binter", "Binter");
-    localStorage.setItem("Iberia", "Iberia Express");
-    localStorage.setItem("Vueling", "Vueling");
+// LocalStorage para guardar aviones
+function storageLocal() {
+    if (!localStorage.getItem("aviones")) {
+        const aviones = [binter, iberiaExpress, vueling];
+        localStorage.setItem("aviones", JSON.stringify(aviones));  // Guardamos los aviones
+    }
 }
 
+// Cargar los asientos ocupados desde sessionStorage
 function cargarAsientosOcupados(avion) {
     const asientosGuardados = sessionStorage.getItem(avion.name);
     if (asientosGuardados) {
-        avion.asientosOcupados = asientosGuardados.split(',');      // Pasamos una cadena de texto a array
+        avion.asientosOcupados = asientosGuardados.split(',');  // Convertir string en array
     }
 }
 
+// Guardar los asientos seleccionados en sessionStorage
 function storageSession(avion, asientoId) {
-    avion.asientosOcupados.push(asientoId); // Añadir el asiento a la lista de ocupados
-    sessionStorage.setItem(avion.name, avion.asientosOcupados.join(',')); // Guardar en sessionStorage y transformamos el array en cadena de texto
+    avion.asientosOcupados.push(asientoId);  // Añadir asiento al array de ocupados
+    sessionStorage.setItem(avion.name, avion.asientosOcupados.join(','));  // Guardar en sessionStorage
 }
 
 function asientos(avion) {
-    document.write(`<table>`);
-    for (let fila = 0; fila < avion.rows; fila++) { // Generación asientos
-        let claseFila = '';
-        if (fila <= 3) {
-            claseFila = 'fila-naranja'; // Color a los asientos de primera clase
-        } else if (fila > 3 && fila <= 9) {
-            claseFila = 'fila-azul'; // Color a los asientos de clase turista
-        }
+    const container = document.getElementById('seat-container');
+    container.innerHTML = '';  // Limpiar el contenido del contenedor
 
-        document.write(`<tr class="${claseFila}">`); // Creación de tabla para cada asiento generado
-        console.log("Filas " + (fila + 1));
-        for (let columna = 0; columna < avion.column; columna++) {
-            let asientoId = `asiento-${fila + 1}-${columna + 1}`; // Crear el ID para cada asiento en función de su fila y columna
+    const table = document.createElement('table');  // Crear tabla
 
-            // Generamos aleatoriamente el color del asiento (verde o rojo)
-            let colorAsiento = Math.random() < 0.5 ? 'green' : 'red'; // Verde = disponible, Rojo = ocupado
-            avion.color.push({ id: asientoId, color: colorAsiento }); // Guardamos el color en un array para verificar más tarde
+    for (let fila = 0; fila < avion.rows; fila++) {
+        const row = document.createElement('tr');  // Crear fila
+        row.className = fila <= 3 ? 'fila-naranja' : 'fila-azul';
+        // Crear un array temporal con posiciones de asientos
+        let asientosFila = Array.from({ length: avion.columns }, (_, i) => i);
+        // Mezclar el array para que los asientos se asignen aleatoriamente
+        asientosFila = asientosFila.sort(() => Math.random() - 0.5);
+        // Determinar la mitad de los asientos que serán ocupados (rojo)
+        let mitadAsientos = Math.floor(avion.columns / 2);
 
-            document.write(`
-                <td>
-                    <button id="${asientoId}" class="seat" style="background-color: ${colorAsiento};">  
-                        ${fila + 1} - ${columna + 1}
-                    </button> 
-                </td>
-            `);
+        for (let columna = 0; columna < avion.columns; columna++) {
+            const asientoId = `asiento-${fila + 1}-${columna + 1}`;
+            const button = document.createElement('button');
+            button.id = asientoId;
+            button.className = 'seat';
+            button.textContent = `${fila + 1}-${columna + 1}`;
 
-            document.getElementById(asientoId).addEventListener('click', function() {
-                if (this.style.backgroundColor === 'green') {
-                    this.style.backgroundColor = 'red'; // Cambia a rojo cuando se selecciona
-                    storageSession(avion, asientoId); // Guardar asiento en sessionStorage
-                } else {
-                    console.log("Este asiento ya está ocupado");
+            // Asignar color según la aleatorización
+            if (asientosFila.indexOf(columna) < mitadAsientos) {
+                button.style.backgroundColor = 'red';  // Ocupado
+            } else {
+                button.style.backgroundColor = 'green';  // Disponible
+            }
+
+            // Añadir eventos para seleccionar/deseleccionar asientos
+            button.addEventListener('click', function () {
+                if (button.style.backgroundColor === 'green') {
+                    button.style.backgroundColor = 'red';  // Cambia a rojo (ocupado)
+                    storageSession(avion, asientoId);  // Guardar en sessionStorage
+                } else if (button.style.backgroundColor === 'red') {
+                    console.log("No se puede, ya está ocupado"); // Mensaje en consola
                 }
+                actualizarPrecio(avion);  // Actualizar precio cada vez que se selecciona un asiento
             });
-            console.log("Columnas " + (columna + 1));
+
+            // Añadir el botón a la celda de la tabla
+            const cell = document.createElement('td');
+            cell.appendChild(button);
+            row.appendChild(cell);
         }
-        document.write(`</tr>`);
+
+        table.appendChild(row);
     }
-    document.write(`</table>`);
+
+    container.appendChild(table);  // Añadir tabla al contenedor
+
+    cargarAsientosOcupados(avion);  // Cargar asientos ocupados de la sesión anterior
+    marcarAsientosOcupados(avion);  // Marcar visualmente los asientos ocupados
 }
 
+// Marcar asientos ocupados visualmente en el DOM
+function marcarAsientosOcupados(avion) {
+    avion.asientosOcupados.forEach(asientoId => {
+        const asiento = document.getElementById(asientoId);
+        if (asiento) {
+            asiento.style.backgroundColor = 'red';  // Marcar como ocupado
+        }
+    });
+}
+
+// Calcular el precio total basado en los asientos ocupados
+function actualizarPrecio(avion) {
+    const precioTotal = avion.asientosOcupados.length * avion.priceBase;
+    document.getElementById('precioTotal').textContent = `Precio Total: €${precioTotal}`; // Muestra el precio total
+}
+
+// Inicialización
 storageLocal();
