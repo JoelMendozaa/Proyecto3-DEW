@@ -62,10 +62,9 @@ function asientos(avion) {
             document.getElementById(asientoId).addEventListener('click', function() {
                 if (this.style.backgroundColor === 'green') {
                     this.style.backgroundColor = 'red'; // Cambia a rojo cuando se selecciona
-                    guardarAsientoEnSessionStorage(avion, asientoId); // Guardar asiento en sessionStorage
-                    alert(`Has seleccionado el asiento ${asientoId}`);
+                    storageSession(avion, asientoId); // Guardar asiento en sessionStorage
                 } else {
-                    alert("Este asiento ya está ocupado");
+                    console.log("Este asiento ya está ocupado");
                 }
             });
             console.log("Columnas " + (columna + 1));
@@ -75,4 +74,4 @@ function asientos(avion) {
     document.write(`</table>`);
 }
 
-guardarAvionesEnLocalStorage();
+storageLocal();
