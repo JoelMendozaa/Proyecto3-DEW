@@ -13,10 +13,16 @@ const vueling = new Avion("Vueling", 15, 4, 140);
 
 // LocalStorage para guardar aviones
 function storageLocal() {
-    if (!localStorage.getItem("aviones")) {
-        const aviones = [binter, iberiaExpress, vueling];
-        localStorage.setItem("aviones", JSON.stringify(aviones));  // Guardamos los aviones
-    }
+  if (!localStorage.getItem("aviones")) {
+    const aviones = [binter, iberiaExpress, vueling];
+    localStorage.setItem("aviones", JSON.stringify(aviones));
+    console.log("Aviones almacenados en localStorage:", localStorage.getItem("aviones"));
+  } else {
+    console.log("Aviones ya están en localStorage");
+  }
+
+  // Intentar recuperar los aviones y verificar si la deserialización funciona
+  const avionesGuardados = localStorage.getItem("aviones");
 }
 
 // Cargar los asientos ocupados desde sessionStorage
@@ -42,12 +48,9 @@ function asientos(avion) {
     for (let fila = 0; fila < avion.rows; fila++) {
         const row = document.createElement('tr');  // Crear fila
         row.className = fila <= 3 ? 'fila-naranja' : 'fila-azul';
-        // Crear un array temporal con posiciones de asientos
-        let asientosFila = Array.from({ length: avion.columns }, (_, i) => i);
-        // Mezclar el array para que los asientos se asignen aleatoriamente
-        asientosFila = asientosFila.sort(() => Math.random() - 0.5);
-        // Determinar la mitad de los asientos que serán ocupados (rojo)
-        let mitadAsientos = Math.floor(avion.columns / 2);
+        let asientosFila = Array.from({ length: avion.columns }, (_, i) => i);   // Crear un array temporal con posiciones de asientos
+        asientosFila = asientosFila.sort(() => Math.random() - 0.5);      // Mezclar el array para que los asientos se asignen aleatoriamente
+        let mitadAsientos = Math.floor(avion.columns / 2);        // Determinar la mitad de los asientos que serán ocupados (rojo)
 
         for (let columna = 0; columna < avion.columns; columna++) {
             const asientoId = `asiento-${fila + 1}-${columna + 1}`;
