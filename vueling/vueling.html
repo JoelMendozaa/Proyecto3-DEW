@@ -15,7 +15,11 @@
 
     <script src="../code.js"></script>
     <script>
-        asientos(vueling);
+        $(document).ready(function() {
+            const aviones = JSON.parse(localStorage.getItem("aviones"));
+            const vueling = aviones.find(avion => avion.name === "Vueling");
+            asientos(vueling);
+        });
     </script>
 </body>
 </html>

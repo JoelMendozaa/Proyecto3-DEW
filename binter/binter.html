@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Binter</title>
 </head>
 <body>
-    <div class="header">
-        <h1>Aerolínea Binter</h1>
-    </div>
-    <div id="seat-container"></div>  <!-- Aquí irán los asientos -->
-    <p id="precioTotal">Precio Total: €0</p> <!-- Precio Total -->
-
+    <h1>Binter</h1>
+    <div id="seat-container"></div>
+    <div id="precioTotal"></div>
     <script src="../code.js"></script>
     <script>
-        asientos(binter);  <!-- Genera los asientos para Binter -->
+        $(document).ready(function() {
+            const aviones = JSON.parse(localStorage.getItem("aviones"));
+            const binter = aviones.find(avion => avion.name === "Binter");
+            asientos(binter);
+        });
     </script>
 </body>
 </html>
